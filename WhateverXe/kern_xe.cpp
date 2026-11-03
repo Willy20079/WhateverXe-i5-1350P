@@ -8481,6 +8481,19 @@ void XE::wrapAlderLakeNSetupWorkLoop(IOService *controller,IOWorkLoop *workLoop)
                 const auto ddi=c.bridge.bootPort;
                 const bool dp=ddi<7 && (callbackXE->adlnOutputWiring.links()&(1U<<ddi));
                 bool linked=!dp;
+                if(dp && ddi<2 &&
+                   (callbackXE->adlnOutputWiring.panel&(1U<<ddi)) &&
+                   port && port->getMetaClass()->getClassSize()>=0x6B0 &&
+                   Display13FBMemory::field<uint32_t>(port,0x550)==0 &&
+                   Display13FBMemory::field<uint32_t>(port,0x120)==ddi &&
+                   Display13FBMemory::field<void *>(port,0x578)==c.access) {
+                    if(callbackXE->display13TCBaseMode)
+                        reinterpret_cast<uint32_t (*)(OSObject *,uint32_t)>(
+                            callbackXE->display13TCBaseMode)(port,1);
+                    else
+                        *reinterpret_cast<uint32_t *>(
+                            reinterpret_cast<uint8_t *>(port)+0x550)=1;
+                }
                 if(dp && display13SSTPort(port)) {
                     Display13FBBootIO io{c.map};auto &boot=c.displayScratch;AlderLakeN::readDisplay(io,true,boot);
                     if(ddi>=3) {
