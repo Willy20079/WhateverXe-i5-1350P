@@ -3893,8 +3893,11 @@ Display13OutputWiring XE::display13BoardWiring(IOService *provider) {
         board=XELP::VBT::display13Fixed(
             firmwarePorts,Display13OutputWiring::Physical,xeProfile.family);
         if(board.panel) {
+            board.hdmi=0;
             board.dp=0;
             board.typeC=0;
+            for(unsigned d=0; d<Display13OutputWiring::Ports; ++d)
+                board.ddc[d]=0;
         }
     }
     else {
