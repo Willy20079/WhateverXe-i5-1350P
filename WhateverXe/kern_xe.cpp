@@ -3889,7 +3889,14 @@ Display13OutputWiring XE::display13BoardWiring(IOService *provider) {
     // Display13 physical capacity is shared by ADL-N and mobile ADL/RPL.
     // VBT chooses board routing; a family name must not exclude TC PHYs.
     Display13OutputWiring board;
-    if(!property)board=XELP::VBT::display13Fixed(firmwarePorts,Display13OutputWiring::Physical,xeProfile.family);
+    if(!property) {
+        board=XELP::VBT::display13Fixed(
+            firmwarePorts,Display13OutputWiring::Physical,xeProfile.family);
+        if(board.panel) {
+            board.dp=0;
+            board.typeC=0;
+        }
+    }
     else {
         // Preserve the older ADL-N Combo property contract. It cannot select TC.
         if(adlpDisplaySelected)return {};
